@@ -1,33 +1,53 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Calendar, Heart, Brain } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { Sparkles, Calendar, Heart, Brain, Smile } from "lucide-react";
 import { YingYangSymbol } from "./YingYangSymbol";
 
 interface JournalEntryProps {
-  onSave?: (entry: string) => void;
+  onSave?: (entry: string, mood?: number) => void;
   aiPrompt?: string;
+  currentMood?: number;
+  onMoodChange?: (mood: number) => void;
 }
 
 export const JournalEntry = ({ 
   onSave,
-  aiPrompt = "How are you feeling today? What thoughts are flowing through your mind?"
+  aiPrompt = "How are you feeling today? What thoughts are flowing through your mind?",
+  currentMood = 5,
+  onMoodChange
 }: JournalEntryProps) => {
   const [entry, setEntry] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [mood, setMood] = useState<number[]>([currentMood]);
+
+  // Sync mood with parent component
+  useEffect(() => {
+    setMood([currentMood]);
+  }, [currentMood]);
 
   const handleSave = async () => {
     if (!entry.trim()) return;
     
     setIsAnalyzing(true);
-    // Simulate AI analysis
-    setTimeout(() => {
-      onSave?.(entry);
-      setIsAnalyzing(false);
+    
+    try {
+      await onSave?.(entry, mood[0]);
+      onMoodChange?.(mood[0]);
       setEntry("");
-    }, 2000);
+    } catch (error) {
+      console.error('Save failed:', error);
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const handleMoodChange = (newMood: number[]) => {
+    setMood(newMood);
+    onMoodChange?.(newMood[0]);
   };
 
   const today = new Date().toLocaleDateString('en-US', { 
@@ -78,6 +98,33 @@ export const JournalEntry = ({
                 {aiPrompt}
               </p>
             </div>
+          </div>
+        </div>
+
+        {/* Mood Slider */}
+        <div className="bg-muted/30 p-4 rounded-lg border border-border/30">
+          <div className="flex items-center gap-3 mb-3">
+            <Smile className="w-5 h-5 text-accent" />
+            <div>
+              <p className="text-sm font-medium text-foreground">
+                Current Mood
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {mood[0]}/10 - How are you feeling right now?
+              </p>
+            </div>
+          </div>
+          <Slider
+            value={mood}
+            onValueChange={handleMoodChange}
+            max={10}
+            min={1}
+            step={1}
+            className="w-full"
+          />
+          <div className="flex justify-between text-xs text-muted-foreground mt-2">
+            <span>1 (Low)</span>
+            <span>10 (High)</span>
           </div>
         </div>
 

@@ -2,9 +2,14 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { YingYangSymbol } from "@/components/YingYangSymbol";
 import { JournalEntry } from "@/components/JournalEntry";
+import { TherapistChat } from "@/components/TherapistChat";
+import { Dashboard } from "@/components/Dashboard";
 import { FloatingDots } from "@/components/ui/floating-elements";
+import { LocalStorage } from "@/lib/storage";
+import { AIAnalyzer } from "@/lib/aiAnalysis";
 import { 
   Brain, 
   Heart, 
@@ -13,16 +18,43 @@ import {
   Sparkles,
   Calendar,
   BarChart3,
-  Lock
+  Lock,
+  MessageCircle,
+  PenTool,
+  Activity
 } from "lucide-react";
 
 const Index = () => {
   const [savedEntries, setSavedEntries] = useState(0);
+  const [currentMood, setCurrentMood] = useState<number>(5);
 
-  const handleSaveEntry = (entry: string) => {
+  const handleSaveEntry = async (entry: string, mood?: number) => {
     setSavedEntries(prev => prev + 1);
-    // Here you would typically save to a database
-    console.log("Entry saved:", entry);
+    
+    // Save to local storage with AI analysis
+    const journalEntry = {
+      id: Date.now().toString(),
+      content: entry,
+      timestamp: new Date(),
+      mood: mood || currentMood,
+      aiPrompt: currentPrompt
+    };
+
+    // Analyze and save
+    try {
+      await AIAnalyzer.initialize();
+      const sentiment = await AIAnalyzer.analyzeSentiment(entry);
+      const themes = AIAnalyzer.extractThemes(entry);
+      
+      LocalStorage.saveJournalEntry({
+        ...journalEntry,
+        sentiment,
+        themes
+      });
+    } catch (error) {
+      console.warn('Analysis failed:', error);
+      LocalStorage.saveJournalEntry(journalEntry);
+    }
   };
 
   const features = [
@@ -107,10 +139,42 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Journal Entry Section */}
+      {/* Main App Section */}
       <section className="py-16">
-        <div className="container mx-auto px-4 max-w-4xl">
-          <JournalEntry onSave={handleSaveEntry} aiPrompt={currentPrompt} />
+        <div className="container mx-auto px-4 max-w-6xl">
+          <Tabs defaultValue="journal" className="space-y-8">
+            <TabsList className="grid w-full grid-cols-3 mx-auto max-w-md">
+              <TabsTrigger value="journal" className="flex items-center gap-2">
+                <PenTool className="w-4 h-4" />
+                Journal
+              </TabsTrigger>
+              <TabsTrigger value="chat" className="flex items-center gap-2">
+                <MessageCircle className="w-4 h-4" />
+                Therapist
+              </TabsTrigger>
+              <TabsTrigger value="insights" className="flex items-center gap-2">
+                <Activity className="w-4 h-4" />
+                Insights
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="journal" className="max-w-4xl mx-auto">
+              <JournalEntry 
+                onSave={handleSaveEntry} 
+                aiPrompt={currentPrompt}
+                currentMood={currentMood}
+                onMoodChange={setCurrentMood}
+              />
+            </TabsContent>
+
+            <TabsContent value="chat">
+              <TherapistChat onMoodChange={setCurrentMood} />
+            </TabsContent>
+
+            <TabsContent value="insights">
+              <Dashboard />
+            </TabsContent>
+          </Tabs>
         </div>
       </section>
 

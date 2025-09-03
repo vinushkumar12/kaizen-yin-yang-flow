@@ -2,41 +2,68 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
+/* Kaizen Design System - Ying Yang Theme
+All colors MUST be HSL. Inspired by balance, harmony, and continuous improvement.
 */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Core Ying Yang Colors */
+    --background: 0 0% 98%;
+    --foreground: 0 0% 8%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 0 0% 8%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 0 0% 8%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary - Pure Black for Yang energy */
+    --primary: 0 0% 8%;
+    --primary-foreground: 0 0% 98%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secondary - Soft Gray for balance */
+    --secondary: 0 0% 90%;
+    --secondary-foreground: 0 0% 8%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Muted - Light Gray for harmony */
+    --muted: 0 0% 94%;
+    --muted-foreground: 0 0% 40%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Accent - Pure White for Ying energy */
+    --accent: 0 0% 100%;
+    --accent-foreground: 0 0% 8%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Destructive - Minimal red for errors */
+    --destructive: 0 65% 45%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Borders and Inputs */
+    --border: 0 0% 85%;
+    --input: 0 0% 90%;
+    --ring: 0 0% 8%;
 
-    --radius: 0.5rem;
+    /* Border Radius - Organic, flowing curves */
+    --radius: 1rem;
+
+    /* Custom Kaizen Colors */
+    --ying: 0 0% 100%;
+    --yang: 0 0% 8%;
+    --balance: 0 0% 50%;
+    
+    /* Gradients for flow and balance */
+    --gradient-ying-yang: linear-gradient(135deg, hsl(var(--ying)), hsl(var(--yang)));
+    --gradient-flow: linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted)));
+    --gradient-harmony: radial-gradient(circle, hsl(var(--ying)) 0%, hsl(var(--yang)) 100%);
+    
+    /* Shadows for depth and serenity */
+    --shadow-soft: 0 4px 20px -4px hsl(var(--yang) / 0.1);
+    --shadow-medium: 0 10px 40px -8px hsl(var(--yang) / 0.15);
+    --shadow-strong: 0 20px 60px -12px hsl(var(--yang) / 0.2);
+    
+    /* Animations */
+    --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-gentle: all 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
 
     --sidebar-background: 0 0% 98%;
 
@@ -56,33 +83,48 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    /* Dark Mode - Yang Dominant */
+    --background: 0 0% 8%;
+    --foreground: 0 0% 98%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    /* Primary - Pure White for Ying energy in dark mode */
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 8%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    /* Secondary - Dark Gray for balance */
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 98%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    /* Muted - Medium Gray for harmony */
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 70%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    /* Accent - Pure Black for Yang energy */
+    --accent: 0 0% 8%;
+    --accent-foreground: 0 0% 98%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 65% 55%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --border: 0 0% 20%;
+    --input: 0 0% 15%;
+    --ring: 0 0% 98%;
+    
+    /* Inverted gradients for dark mode */
+    --gradient-ying-yang: linear-gradient(135deg, hsl(var(--yang)), hsl(var(--ying)));
+    --gradient-flow: linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted)));
+    --gradient-harmony: radial-gradient(circle, hsl(var(--yang)) 0%, hsl(var(--ying)) 100%);
+    
+    /* Adjusted shadows for dark mode */
+    --shadow-soft: 0 4px 20px -4px hsl(var(--ying) / 0.1);
+    --shadow-medium: 0 10px 40px -8px hsl(var(--ying) / 0.15);
+    --shadow-strong: 0 20px 60px -12px hsl(var(--ying) / 0.2);
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -100,6 +142,55 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  /* Custom scrollbar for harmony */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground));
+  }
+}
+
+@layer components {
+  /* Ying Yang Circle Animation */
+  .ying-yang-spin {
+    animation: ying-yang-rotate 20s linear infinite;
+  }
+  
+  @keyframes ying-yang-rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  
+  /* Flow animation for balance */
+  .flow-gentle {
+    animation: flow-gentle 4s ease-in-out infinite;
+  }
+  
+  @keyframes flow-gentle {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  /* Gradient text for harmony */
+  .gradient-text {
+    background: var(--gradient-ying-yang);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 }

@@ -18,6 +18,10 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				'sans': ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+				'serif': ['Merriweather', 'ui-serif', 'Georgia', 'serif'],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -52,6 +56,10 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				/* Custom Kaizen Colors */
+				ying: 'hsl(var(--ying))',
+				yang: 'hsl(var(--yang))',
+				balance: 'hsl(var(--balance))',
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
@@ -62,6 +70,20 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				}
+			},
+			backgroundImage: {
+				'gradient-ying-yang': 'var(--gradient-ying-yang)',
+				'gradient-flow': 'var(--gradient-flow)',
+				'gradient-harmony': 'var(--gradient-harmony)',
+			},
+			boxShadow: {
+				'soft': 'var(--shadow-soft)',
+				'medium': 'var(--shadow-medium)', 
+				'strong': 'var(--shadow-strong)',
+			},
+			transitionTimingFunction: {
+				'smooth': 'cubic-bezier(0.4, 0, 0.2, 1)',
+				'gentle': 'cubic-bezier(0.25, 0.1, 0.25, 1)',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

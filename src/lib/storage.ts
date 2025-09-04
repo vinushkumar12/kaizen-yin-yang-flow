@@ -1,4 +1,4 @@
-// Local storage utilities for Kaizen journal app
+// Local storage utilities for Kaizen journal app with multi-account support
 export interface JournalEntry {
   id: string;
   content: string;
@@ -11,6 +11,7 @@ export interface JournalEntry {
   };
   themes?: string[];
   mood?: number; // 1-10 scale
+  accountId?: string; // Account-specific data
 }
 
 export interface ChatMessage {
@@ -19,6 +20,7 @@ export interface ChatMessage {
   content: string;
   timestamp: Date;
   sessionId: string;
+  accountId?: string; // Account-specific data
 }
 
 export interface TherapistSession {
@@ -30,6 +32,8 @@ export interface TherapistSession {
     start: number;
     end?: number;
   };
+  tone?: 'empathetic' | 'honest' | 'cognitive' | 'solution';
+  accountId?: string; // Account-specific data
 }
 
 export class LocalStorage {
@@ -38,9 +42,20 @@ export class LocalStorage {
   private static readonly SESSIONS_KEY = 'kaizen_therapy_sessions';
   private static readonly SETTINGS_KEY = 'kaizen_settings';
 
+  // Get current account ID
+  private static getCurrentAccountId(): string | null {
+    return localStorage.getItem('kaizen_current_account');
+  }
+
+  // Get account-specific key
+  private static getAccountKey(baseKey: string): string {
+    const accountId = this.getCurrentAccountId();
+    return accountId ? `${baseKey}_${accountId}` : baseKey;
+  }
+
   // Journal entries
   static getJournalEntries(): JournalEntry[] {
-    const stored = localStorage.getItem(this.JOURNAL_KEY);
+    const stored = localStorage.getItem(this.getAccountKey(this.JOURNAL_KEY));
     if (!stored) return [];
     
     const entries = JSON.parse(stored);
@@ -52,8 +67,12 @@ export class LocalStorage {
 
   static saveJournalEntry(entry: JournalEntry): void {
     const entries = this.getJournalEntries();
-    entries.push(entry);
-    localStorage.setItem(this.JOURNAL_KEY, JSON.stringify(entries));
+    const entryWithAccount: JournalEntry = {
+      ...entry,
+      accountId: this.getCurrentAccountId() || undefined
+    };
+    entries.push(entryWithAccount);
+    localStorage.setItem(this.getAccountKey(this.JOURNAL_KEY), JSON.stringify(entries));
   }
 
   static updateJournalEntry(id: string, updates: Partial<JournalEntry>): void {
@@ -61,13 +80,13 @@ export class LocalStorage {
     const index = entries.findIndex(entry => entry.id === id);
     if (index !== -1) {
       entries[index] = { ...entries[index], ...updates };
-      localStorage.setItem(this.JOURNAL_KEY, JSON.stringify(entries));
+      localStorage.setItem(this.getAccountKey(this.JOURNAL_KEY), JSON.stringify(entries));
     }
   }
 
   // Chat messages
   static getChatMessages(sessionId?: string): ChatMessage[] {
-    const stored = localStorage.getItem(this.CHAT_KEY);
+    const stored = localStorage.getItem(this.getAccountKey(this.CHAT_KEY));
     if (!stored) return [];
     
     const messages = JSON.parse(stored).map((msg: any) => ({
@@ -80,13 +99,17 @@ export class LocalStorage {
 
   static saveChatMessage(message: ChatMessage): void {
     const messages = this.getChatMessages();
-    messages.push(message);
-    localStorage.setItem(this.CHAT_KEY, JSON.stringify(messages));
+    const messageWithAccount: ChatMessage = {
+      ...message,
+      accountId: this.getCurrentAccountId() || undefined
+    };
+    messages.push(messageWithAccount);
+    localStorage.setItem(this.getAccountKey(this.CHAT_KEY), JSON.stringify(messages));
   }
 
   // Therapy sessions
   static getTherapySessions(): TherapistSession[] {
-    const stored = localStorage.getItem(this.SESSIONS_KEY);
+    const stored = localStorage.getItem(this.getAccountKey(this.SESSIONS_KEY));
     if (!stored) return [];
     
     return JSON.parse(stored).map((session: any) => ({
@@ -102,15 +125,45 @@ export class LocalStorage {
 
   static saveTherapySession(session: TherapistSession): void {
     const sessions = this.getTherapySessions();
-    const existingIndex = sessions.findIndex(s => s.id === session.id);
+    const sessionWithAccount: TherapistSession = {
+      ...session,
+      accountId: this.getCurrentAccountId() || undefined
+    };
     
+    const existingIndex = sessions.findIndex(s => s.id === session.id);
     if (existingIndex !== -1) {
-      sessions[existingIndex] = session;
+      sessions[existingIndex] = sessionWithAccount;
     } else {
-      sessions.push(session);
+      sessions.push(sessionWithAccount);
     }
     
-    localStorage.setItem(this.SESSIONS_KEY, JSON.stringify(sessions));
+    localStorage.setItem(this.getAccountKey(this.SESSIONS_KEY), JSON.stringify(sessions));
+  }
+
+  // Get today's entries (multiple entries allowed per day)
+  static getTodayEntries(): JournalEntry[] {
+    const entries = this.getJournalEntries();
+    const today = new Date();
+    return entries.filter(entry => {
+      const entryDate = new Date(entry.timestamp);
+      return entryDate.toDateString() === today.toDateString();
+    }).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()); // Most recent first
+  }
+
+  // Get today's first entry (for backward compatibility)
+  static getTodayEntry(): JournalEntry | null {
+    const todayEntries = this.getTodayEntries();
+    return todayEntries.length > 0 ? todayEntries[0] : null;
+  }
+
+  // Check if today has any entries
+  static hasTodayEntries(): boolean {
+    return this.getTodayEntries().length > 0;
+  }
+
+  // Get entry count for today
+  static getTodayEntryCount(): number {
+    return this.getTodayEntries().length;
   }
 
   // Analytics helpers
@@ -196,5 +249,26 @@ export class LocalStorage {
     return Array.from(themeMap.entries())
       .map(([theme, count]) => ({ theme, count }))
       .sort((a, b) => b.count - a.count);
+  }
+
+  // Settings
+  static getSettings(): any {
+    const stored = localStorage.getItem(this.getAccountKey(this.SETTINGS_KEY));
+    return stored ? JSON.parse(stored) : {};
+  }
+
+  static saveSettings(settings: any): void {
+    localStorage.setItem(this.getAccountKey(this.SETTINGS_KEY), JSON.stringify(settings));
+  }
+
+  // Clear all data for current account
+  static clearAccountData(): void {
+    const accountId = this.getCurrentAccountId();
+    if (accountId) {
+      localStorage.removeItem(`${this.JOURNAL_KEY}_${accountId}`);
+      localStorage.removeItem(`${this.CHAT_KEY}_${accountId}`);
+      localStorage.removeItem(`${this.SESSIONS_KEY}_${accountId}`);
+      localStorage.removeItem(`${this.SETTINGS_KEY}_${accountId}`);
+    }
   }
 }

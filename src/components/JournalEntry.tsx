@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { Sparkles, Calendar, Heart, Brain, Smile } from "lucide-react";
 import { YingYangSymbol } from "./YingYangSymbol";
+import { AIAnalyzer } from "@/lib/aiAnalysis";
 
 interface JournalEntryProps {
   onSave?: (entry: string, mood?: number) => void;
@@ -16,7 +17,7 @@ interface JournalEntryProps {
 
 export const JournalEntry = ({ 
   onSave,
-  aiPrompt = "How are you feeling today? What thoughts are flowing through your mind?",
+  aiPrompt = AIAnalyzer.getPersonalizedPrompt(),
   currentMood = 5,
   onMoodChange
 }: JournalEntryProps) => {
@@ -150,7 +151,7 @@ export const JournalEntry = ({
             >
               {isAnalyzing ? (
                 <div className="flex items-center gap-2">
-                  <YingYangSymbol size="sm" animate />
+                  <YingYangSymbol size="sm" />
                   <span>Reflecting...</span>
                 </div>
               ) : (

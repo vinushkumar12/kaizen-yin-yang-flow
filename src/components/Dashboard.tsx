@@ -416,7 +416,7 @@ export const Dashboard = () => {
       {isAnalyzing && (
         <Card className="p-4 border-0 bg-muted/30">
           <div className="flex items-center justify-center gap-3 text-sm text-muted-foreground">
-            <YingYangSymbol size="sm" animate />
+            <YingYangSymbol size="sm" />
             <span>Analyzing your entries with on-device AI...</span>
           </div>
         </Card>
